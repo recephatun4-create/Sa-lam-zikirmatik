@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#142b68">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>Zikirmatik</title>
+<style>
+*{box-sizing:border-box} body{margin:0;min-height:100vh;background:radial-gradient(ellipse at center,#4b4b4b 0,#202020 65%,#090909 100%);font-family:Arial,sans-serif;color:#fff;display:flex;justify-content:center;align-items:center;padding:18px}
+.app{width:min(100%,410px);text-align:center}.strap{height:90px;width:140px;margin:auto;background:linear-gradient(90deg,#777,#aaa,#777);border-radius:28px;border:5px solid #777;position:relative;z-index:0}.strap:before,.strap:after{content:"";position:absolute;width:17px;height:17px;border-radius:50%;background:#333;border:3px solid #aaa;left:calc(50% - 8px)}.strap:before{top:10px}.strap:after{bottom:10px}
+.device{position:relative;z-index:1;margin:-28px auto -28px;width:100%;padding:24px 22px 30px;border-radius:75px;background:linear-gradient(145deg,#5279ed,#142b68 65%,#0b1741);border:5px solid #263d83;box-shadow:inset 0 4px 9px #a5b8ff66,0 18px 35px #0009}
+h1{font-size:19px;letter-spacing:2px;margin:0 0 18px;color:#e8edff}
+.screen{background:#9ca89f;border:7px solid #e7e9e6;border-radius:17px;color:#111;box-shadow:0 0 0 7px #080a12;padding:13px 8px 10px;margin:0 auto 26px;width:88%}
+#count{font-family:monospace;font-size:clamp(48px,14vw,68px);font-weight:bold;letter-spacing:4px;line-height:1.1;font-variant-numeric:tabular-nums}
+#selected{font-size:13px;color:#26352b;margin-top:5px}
+button{border:0;cursor:pointer;touch-action:manipulation}
+.mainbtn{width:180px;height:180px;border-radius:50%;background:radial-gradient(circle at 40% 30%,#fff,#d8dadd 55%,#858b96 72%,#252a35 75%);border:9px solid #aeb4c2;box-shadow:0 8px 0 #111a, inset 0 2px 8px #fff; color:#17254f;font-size:24px;font-weight:bold}
+.mainbtn:active{transform:translateY(3px);box-shadow:0 4px 0 #111a}
+.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.small{padding:11px 15px;border-radius:22px;background:#e9edf8;color:#15285e;font-weight:bold}
+.settings{margin:20px auto 0;display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;font-size:14px}
+select{padding:9px;border-radius:10px;border:0}
+.info{margin-top:16px;color:#e2e5f3;font-size:13px}
+</style>
+</head>
+<body>
+<main class="app">
+ <div class="strap"></div>
+ <section class="device">
+  <h1>ZİKİRMATİK</h1>
+  <div class="screen"><div id="count">000</div><div id="selected">Subhanallah</div></div>
+  <button class="mainbtn" id="tap" aria-label="Zikir say">+1</button>
+  <div class="controls">
+   <button class="small" id="reset">Sıfırla</button>
+   <button class="small" id="minus">−1</button>
+   <button class="small" id="vibrate">Titreşim: Açık</button>
+  </div>
+  <div class="settings">
+   <label for="zikr">Zikir:</label>
+   <select id="zikr">
+    <option>Subhanallah</option><option>Elhamdülillah</option><option>Allahu Ekber</option><option>La ilahe illallah</option><option>Estağfirullah</option><option>Salavat</option><option>La havle ve la kuvvete illa billah</option>
+   </select>
+   <label for="target">Hedef:</label>
+   <select id="target"><option value="33">33</option><option value="99">99</option><option value="100">100</option><option value="1000">1000</option><option value="0">Hedef yok</option></select>
+  </div>
+ </section>
+ <div class="strap"></div>
+ <div class="info">Bugünkü toplam: <b id="today">0</b> · Hedef: <b id="goal">33</b></div>
+ <div class="info" id="message">Saymak için büyük düğmeye dokun.</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const todayKey=new Date().toLocaleDateString('en-CA');
+let state={count:0,today:0,date:todayKey,zikr:'Subhanallah',target:33,vibration:true};
+try{const saved=JSON.parse(localStorage.getItem('zikirmatik-v1'));if(saved)state={...state,...saved};}catch(e){}
+if(state.date!==todayKey){state.today=0;state.date=todayKey;}
+$('zikr').value=state.zikr;$('target').value=String(state.target);
+function save(){localStorage.setItem('zikirmatik-v1',JSON.stringify(state));render()}
+function render(){$('count').textContent=String(state.count).padStart(3,'0');$('selected').textContent=state.zikr;$('today').textContent=state.today;$('goal').textContent=state.target?state.target:'Yok';$('vibrate').textContent='Titreşim: '+(state.vibration?'Açık':'Kapalı');$('message').textContent=state.target&&state.count>=state.target?'Maşallah! Hedefe ulaştın.':'Saymak için büyük düğmeye dokun.'}
+function buzz(){if(state.vibration&&navigator.vibrate)navigator.vibrate(35)}
+$('tap').addEventListener('click',()=>{state.count++;state.today++;buzz();save()});
+$('minus').addEventListener('click',()=>{if(state.count>0){state.count--;state.today=Math.max(0,state.today-1);save()}});
+$('reset').addEventListener('click',()=>{if(confirm('Mevcut zikir sayısı sıfırlansın mı?')){state.count=0;save()}});
+$('vibrate').addEventListener('click',()=>{state.vibration=!state.vibration;save()});
+$('zikr').addEventListener('change',e=>{state.zikr=e.target.value;save()});
+$('target').addEventListener('change',e=>{state.target=Number(e.target.value);save()});
+render();
+</script>
+<script>if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(()=>{})); }</script>
+</body></html>

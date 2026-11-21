@@ -1,0 +1,13 @@
+ZİKİRMATİK PWA DOSYALARI
+
+Bu klasör, HTTPS üzerinde yayınlandığında ana ekrana kurulabilen PWA prototipidir.
+
+Dosyalar:
+- index.html: uygulama
+- manifest.webmanifest: uygulama adı ve simgesi
+- sw.js: çevrimdışı önbellek
+- icons/: uygulama simgeleri
+
+Önce ücretsiz bir HTTPS barındırma alanına bu klasörün içeriğini yüklemek gerekir.
+Ardından yayınlanan URL PWABuilder ile Android AAB paketi üretmek için kullanılabilir.
+Bu prototip henüz mağaza yayını için son kalite/gizlilik/politika kontrolünden geçmemiştir.
